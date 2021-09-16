@@ -6,9 +6,12 @@ import (
 )
 
 func TestPrefiltering(t *testing.T) {
-	stringToCheck := "Unrelated things to check"
-	myPrefilter := newPrefilter(len(stringToCheck), "another", "random", "word")
-	Assert(t).That(myPrefilter.IsAllowed(stringToCheck))
+	stringToCheck := "Another thing to check"
+	myPrefilter := newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
+	Assert(t).That(myPrefilter.IsAllowed(stringToCheck)).Equals(false)
+
+	stringToCheck = "123 what if there are numbers"
+	Assert(t).That(myPrefilter.IsAllowed(stringToCheck)).Equals(true)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
