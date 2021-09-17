@@ -14,7 +14,7 @@ type prefilter struct {
 }
 
 func newPrefilter(bufferSize int, reserved ...string) Prefilter {
-	b := make([]byte, 0, bufferSize)
+	b := make([]byte, bufferSize, bufferSize)
 	m := make(map[string]bool)
 	for _, r := range reserved {
 		m[r] = true
@@ -26,7 +26,7 @@ func newPrefilter(bufferSize int, reserved ...string) Prefilter {
 }
 
 func (this *prefilter) IsAllowed(input string) bool {
-	this.buffer = []byte(input)
+	copy(this.buffer[:], input)
 	start := 0
 	for end, r := range this.buffer {
 		//check if uppercase letter
@@ -37,14 +37,22 @@ func (this *prefilter) IsAllowed(input string) bool {
 			}
 		}
 
-		if r == ' ' {
+		if r == ' ' || r == '\n' || r == '\t'{
 			word := this.buffer[start:end]
-			_, restricted := this.restricted[string(word)] //FIXME does this allocate?
+			_, restricted := this.restricted[string(word)]
 			if restricted {
 				return false
 			}
 			start = end + 1
 		}
 	}
+
+	// restricted word may be at eof
+	word := this.buffer[start:]
+	_, restricted := this.restricted[string(word)]
+	if restricted {
+		return false
+	}
+
 	return true
 }

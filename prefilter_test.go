@@ -1,39 +1,57 @@
 package prefilter
 
 import (
-	"reflect"
 	"testing"
 )
 
 func TestPrefiltering(t *testing.T) {
-	stringToCheck := "Another thing to check"
-	myPrefilter := newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
-	Assert(t).That(myPrefilter.IsAllowed(stringToCheck)).Equals(false)
+	assertPrefilter(t, "WORD", false, "WORD")
+	assertPrefilter(t, "word", false, "WORD")
+	assertPrefilter(t, "Word", false, "WORD")
+	assertPrefilter(t, "woRd", false, "WORD")
 
-	stringToCheck = "123 what if there are numbers"
-	Assert(t).That(myPrefilter.IsAllowed(stringToCheck)).Equals(true)
+	assertPrefilter(t, "word", false, "WORD", "RESTRICTED")
+	assertPrefilter(t, "restricted", false, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A sentence with a word in the middle", false, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A sentence with a word\n in the middle", false, "WORD", "RESTRICTED")
+
+	assertPrefilter(t, "A good sentence", true, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A good sentence with no bad words", true, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A good sentence with numbers 1234", true, "WORD", "RESTRICTED")
+
+	assertPrefilter(t, "A bad sentence with numbers word1", false, "WORD1", "RESTRICTED")
+}
+
+func assertPrefilter(t *testing.T, input string, expected bool, reserved ...string) {
+	t.Helper()
+
+	reservedWords := newPrefilter(len(input), reserved...)
+	actual := reservedWords.IsAllowed(input)
+
+	if actual == expected {
+		return
+	}
+
+	t.Errorf("\n"+
+		"Expected: %t\n"+
+		"Actual:   %t\n",
+		expected,
+		actual,
+	)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-type That struct{ t *testing.T }
-type Assertion struct {
-	*testing.T
-	actual interface{}
-}
-
-func Assert(t *testing.T) *That                       { return &That{t: t} }
-func (this *That) That(actual interface{}) *Assertion { return &Assertion{T: this.t, actual: actual} }
-
-func (this *Assertion) IsNil() {
-	this.Helper()
-	if this.actual != nil && !reflect.ValueOf(this.actual).IsNil() {
-		this.Equals(nil)
-	}
-}
-func (this *Assertion) Equals(expected interface{}) {
-	this.Helper()
-	if !reflect.DeepEqual(this.actual, expected) {
-		this.Errorf("\nExpected: %#v\nActual:   %#v", expected, this.actual)
+func BenchmarkTest(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	stringToCheck := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut " +
+		"labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut " +
+		"aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum " +
+		"dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia " +
+		"deserunt mollit anim id est RANDOM"
+	reservedWords := newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
+	for n := 0; n < b.N; n++ {
+		_ = reservedWords.IsAllowed(stringToCheck)
 	}
 }
