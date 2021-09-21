@@ -14,10 +14,12 @@ func TestPrefiltering(t *testing.T) {
 	assertPrefilter(t, "restricted", false, "WORD", "RESTRICTED")
 	assertPrefilter(t, "A sentence with a word in the middle", false, "WORD", "RESTRICTED")
 	assertPrefilter(t, "A sentence with a word\n in the middle", false, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A sentence with a word	 in the middle", false, "WORD", "RESTRICTED")
 
-	assertPrefilter(t, "A good sentence", true, "WORD", "RESTRICTED")
-	assertPrefilter(t, "A good sentence with no bad words", true, "WORD", "RESTRICTED")
+	assertPrefilter(t, "Only good words", true, "WORD", "RESTRICTED")
 	assertPrefilter(t, "A good sentence with numbers 1234", true, "WORD", "RESTRICTED")
+	assertPrefilter(t, "A good sentence 123 with numbers", true, "WORD", "RESTRICTED")
+	assertPrefilter(t, "Trailing space ", true, "WORD", "RESTRICTED")
 
 	assertPrefilter(t, "A bad sentence with numbers word1", false, "WORD1", "RESTRICTED")
 }
