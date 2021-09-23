@@ -46,13 +46,12 @@ func assertPrefilter(t *testing.T, input string, expected bool, reserved ...stri
 
 func BenchmarkTest(b *testing.B) {
 	b.ReportAllocs()
-	b.ResetTimer()
+	// 256 chars
 	stringToCheck := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut " +
 		"labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut " +
-		"aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum " +
-		"dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia " +
-		"deserunt mollit anim id est RANDOM"
+		"aliquip ex ea commodo consequat. Duis aute irure d RANDOM"
 	reservedWords := newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_ = reservedWords.IsAllowed(stringToCheck)
 	}

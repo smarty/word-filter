@@ -1,5 +1,7 @@
 package prefilter
 
+import "strings"
+
 func main() {
 }
 
@@ -9,19 +11,23 @@ type Prefilter interface {
 
 type prefilter struct {
 	buffer     []byte
-	restricted map[string]bool
+	restricted []string
 	Prefilter
 }
 
 func newPrefilter(bufferSize int, reserved ...string) Prefilter {
 	b := make([]byte, bufferSize, bufferSize)
-	m := make(map[string]bool)
+	m := make(map[string]struct{})
 	for _, r := range reserved {
-		m[r] = true
+		m[r] = struct{}{}
+	}
+	restricted := make([]string, 0, len(m))
+	for key, _ := range m {
+		restricted = append(restricted, key)
 	}
 	return &prefilter{
 		buffer:     b,
-		restricted: m,
+		restricted: restricted,
 	}
 }
 
@@ -39,8 +45,7 @@ func (this *prefilter) IsAllowed(input string) bool {
 
 		if r == ' ' || r == '\n' || r == '\t'{
 			word := this.buffer[start:end]
-			_, restricted := this.restricted[string(word)]
-			if restricted {
+			if contains(this.restricted, word) {
 				return false
 			}
 			start = end + 1
@@ -49,10 +54,30 @@ func (this *prefilter) IsAllowed(input string) bool {
 
 	// restricted word may be at eof
 	word := this.buffer[start:]
-	_, restricted := this.restricted[string(word)]
-	if restricted {
+	if contains(this.restricted, word) {
 		return false
 	}
 
 	return true
 }
+
+func contains(s []string, word []byte) bool {
+	for _, v := range s {
+		if v == string(word) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (this *prefilter) IsAllowed2(input string) bool {
+	input = strings.ToUpper(input)
+	for _, word := range this.restricted {
+		if strings.Contains(input, word) {
+			return false
+		}
+	}
+	return true
+}
+
