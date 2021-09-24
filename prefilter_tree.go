@@ -4,11 +4,6 @@ type prefilterTree struct {
 	Prefilter
 }
 
-type treeNode struct {
-	Letter rune
-	Parent *treeNode
-	Children []*treeNode
-}
 
 func newPrefilterTree(reserved ...string) Prefilter {
 

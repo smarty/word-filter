@@ -36,10 +36,10 @@ func (this *prefilter) IsAllowed(input string) bool {
 	start := 0
 	for end, r := range this.buffer {
 		//check if uppercase letter
-		if !('A' <= r && r <= 'Z') {
+		if !('a' <= r && r <= 'z') {
 			//check if lowercase letter, change to upper
-			if 'a' <= r && r <= 'z' {
-				this.buffer[end] -= 'a' - 'A'
+			if 'A' <= r && r <= 'Z' {
+				this.buffer[end] += 'a' - 'A'
 			}
 		}
 
