@@ -1,15 +1,21 @@
 package prefilter
 
 type prefilterTree struct {
-	Prefilter
+	buffer         []byte
+	restrictedRoot *treeNode
 }
 
-
-func newPrefilterTree(reserved ...string) Prefilter {
-
-	return &prefilterTree{}
-}
-
-func (this *prefilter) IsAllowed3(input string) bool {
-	return true
+func newPrefilterTree(bufferSize int, reserved ...string) *treeNode {
+	b := make([]byte, bufferSize, bufferSize)
+	root := treeNode{}
+	for _, word := range reserved {
+		if err := root.Add([]byte(word)); err != nil {	//TODO error handling
+			return nil
+		}
+	}
+	tree := prefilterTree{
+		buffer: b,
+		restrictedRoot: &root,
+	}
+	return tree.restrictedRoot
 }

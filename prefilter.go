@@ -35,9 +35,9 @@ func (this *prefilter) IsAllowed(input string) bool {
 	copy(this.buffer[:], input)
 	start := 0
 	for end, r := range this.buffer {
-		//check if uppercase letter
+		//check if lowercase letter
 		if !('a' <= r && r <= 'z') {
-			//check if lowercase letter, change to upper
+			//check if uppercase letter, change to lower
 			if 'A' <= r && r <= 'Z' {
 				this.buffer[end] += 'a' - 'A'
 			}
@@ -61,9 +61,9 @@ func (this *prefilter) IsAllowed(input string) bool {
 	return true
 }
 
-func contains(s []string, word []byte) bool {
-	for _, v := range s {
-		if v == string(word) {
+func contains(restricted []string, word []byte) bool {
+	for _, s := range restricted {
+		if s == string(word) {
 			return true
 		}
 	}

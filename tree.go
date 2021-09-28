@@ -1,10 +1,10 @@
 package prefilter
 
 type treeNode struct {
-	wordFragment string
-	parent       *treeNode
-	children     []*treeNode
-	isWord       bool
+	wordFragmentUpper byte
+	wordFragmentLower byte
+	children          []*treeNode
+	isWord            bool
 }
 
 func (this *treeNode) Add(word []byte) error {
@@ -15,9 +15,9 @@ func (this *treeNode) Add(word []byte) error {
 
 	wordFragment := word[0]
 
-	//check if uppercase letter
+	//check if lowercase letter
 	if !('a' <= wordFragment && wordFragment <= 'z') {
-		//check if lowercase letter, change to upper
+		//check if uppercase letter, change to lower
 		if 'A' <= wordFragment && wordFragment <= 'Z' {
 			wordFragment += 'a' - 'A'
 		}
@@ -25,16 +25,16 @@ func (this *treeNode) Add(word []byte) error {
 
 	remainingWord := word[1:]
 	for _, child := range this.children {
-		if child.wordFragment == string(wordFragment) {
+		if child.wordFragmentLower == wordFragment {
 			return child.Add(remainingWord)
 		}
 	}
 
 	child := &treeNode{
-		wordFragment: string(wordFragment),
-		parent:       this,
-		children:     nil,
-		isWord:       false,
+		wordFragmentLower: wordFragment,
+		wordFragmentUpper: wordFragment - ('a' - 'A'),
+		children:          nil,
+		isWord:            false,
 	}
 	if err := child.Add(remainingWord); err != nil {
 		return err
@@ -45,35 +45,35 @@ func (this *treeNode) Add(word []byte) error {
 }
 
 func (this *treeNode) IsAllowed(input []byte) bool {
-	// pass in whole string, if first letter doesn't match find next space, look at next letters
-
+	index := 0
+	allowed := true
+	for index < len(input) {
+		if allowed, index = this.isAllowedHelper(input, index); allowed == false {
+			return false
+		}
+		index += 1
+	}
 	return true
 }
 
-func (this *treeNode) isAllowedHelper(word []byte, index int) (bool, int) {
-
-	if len(word) == 0 || word[0] == ' ' || word[0] == '\n' || word[0] == '\t' {
+func (this *treeNode) isAllowedHelper(input []byte, index int) (bool, int) {
+	if len(input) == index || input[index] == ' ' || input[index] == '\n' || input[index] == '\t' {
 		if this.isWord == true {
-			return false, 0
+			return false, index
 		}
 		return true, index
 	}
 
-	//check if uppercase letter
-	if !('a' <= word[0] && word[0] <= 'z') {
-		//check if lowercase letter, change to upper
-		if 'A' <= word[0] && word[0] <= 'Z' {
-			word[0] += 'a' - 'A'
-		} else {
-			return true, index
-		}
-	}
-
-
 	for _, child := range this.children {
-		if string(word) == child.wordFragment {
-			index += len(child.wordFragment)
-			return child.isAllowedHelper(word[len(child.wordFragment):], index)
+		if input[index] == child.wordFragmentLower {
+			return child.isAllowedHelper(input, index + 1)
+		} else if input[index] == child.wordFragmentUpper {
+			return child.isAllowedHelper(input, index + 1)
+		} else {
+			for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index + 1 {
+				index += 1
+			}
+			return true, index
 		}
 	}
 	return true, index
