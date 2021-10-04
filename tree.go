@@ -66,11 +66,11 @@ func (this *treeNode) isAllowedHelper(input []byte, index int) (bool, int) {
 
 	for _, child := range this.children {
 		if input[index] == child.wordFragmentLower {
-			return child.isAllowedHelper(input, index + 1)
+			return child.isAllowedHelper(input, index+1)
 		} else if input[index] == child.wordFragmentUpper {
-			return child.isAllowedHelper(input, index + 1)
+			return child.isAllowedHelper(input, index+1)
 		} else {
-			for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index + 1 {
+			for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index+1 {
 				index += 1
 			}
 			return true, index

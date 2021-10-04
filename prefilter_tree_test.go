@@ -46,7 +46,7 @@ func BenchmarkTreeTest(b *testing.B) {
 	stringToCheck := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut " +
 		"labore et dolore magna aliqua. Ut EMIM ad minim veniam, quis nostrud exercitation ULLAMCO laboris nisi ut " +
 		"aliquip ex ea commodo consequat. Duis aute irure d RANDOM"
-	reservedTree:= newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
+	reservedTree := newPrefilter(len(stringToCheck), "ANOTHER", "RANDOM", "WORD")
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_ = reservedTree.IsAllowed(stringToCheck)

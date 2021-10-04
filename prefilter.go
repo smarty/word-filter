@@ -43,7 +43,7 @@ func (this *prefilter) IsAllowed(input string) bool {
 			}
 		}
 
-		if r == ' ' || r == '\n' || r == '\t'{
+		if r == ' ' || r == '\n' || r == '\t' {
 			word := this.buffer[start:end]
 			if contains(this.restricted, word) {
 				return false
@@ -80,4 +80,3 @@ func (this *prefilter) IsAllowed2(input string) bool {
 	}
 	return true
 }
-
