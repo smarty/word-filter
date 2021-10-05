@@ -47,7 +47,10 @@ func (this *treeNode) Add(word []byte) error {
 func (this *treeNode) IsAllowed(input []byte) bool {
 	index := 0
 	allowed := true
-	for index < len(input) {
+
+	inputLength := len(input)
+
+	for index < inputLength {
 		if allowed, index = this.isAllowedHelper(input, index); allowed == false {
 			return false
 		}
