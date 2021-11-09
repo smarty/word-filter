@@ -1,4 +1,4 @@
-package prefilter
+package wordfilter
 
 type Prefilter interface {
 	IsAllowed(value string) bool
