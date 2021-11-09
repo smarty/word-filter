@@ -1,6 +1,6 @@
 package wordfilter
 
-type Prefilter interface {
+type Filter interface {
 	IsAllowed(value string) bool
 }
 
@@ -11,7 +11,7 @@ type treeNode struct {
 	children          []*treeNode
 }
 
-func New(reserved ...string) Prefilter {
+func New(reserved ...string) Filter {
 	this := &treeNode{}
 
 	for _, item := range reserved {
