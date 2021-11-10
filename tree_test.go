@@ -2,27 +2,26 @@ package wordfilter
 
 import "testing"
 
-func TestTreePrefiltering(t *testing.T) {
-	assertTreePrefilter(t, "WORD", false, "word")
-	assertTreePrefilter(t, "word", false, "word")
-	assertTreePrefilter(t, "woRd", false, "word")
+func TestTreeFiltering(t *testing.T) {
+	assertContains(t, "WORD", true, "word")
+	assertContains(t, "word", true, "word")
+	assertContains(t, "woRd", true, "word")
 
-	assertTreePrefilter(t, "A sentence with a word in the middle", false, "word", "restricted")
-	assertTreePrefilter(t, "A sentence with a word\n in the middle", false, "word", "restricted")
-	assertTreePrefilter(t, "A sentence with a word	 in the middle", false, "word", "restricted")
+	assertContains(t, "A sentence with a word in the middle", true, "word", "restricted")
+	assertContains(t, "A sentence with a word\n in the middle", true, "word", "restricted")
+	assertContains(t, "A sentence with a word	 in the middle", true, "word", "restricted")
 
-	assertTreePrefilter(t, "Only good words", true, "word", "restricted")
-	assertTreePrefilter(t, "A good sentence 123 with numbers", true, "word", "restricted")
-	assertTreePrefilter(t, "Trailing space ", true, "word", "restricted")
+	assertContains(t, "Only good words", false, "word", "restricted")
+	assertContains(t, "A good sentence 123 with numbers", false, "word", "restricted")
+	assertContains(t, "Trailing space ", false, "word", "restricted")
 
-	assertTreePrefilter(t, "A bad sentence with numbers word1", false, "word1", "restricted")
+	assertContains(t, "A bad sentence with numbers word1", true, "word1", "restricted")
 }
-
-func assertTreePrefilter(t *testing.T, input string, expected bool, reserved ...string) {
+func assertContains(t *testing.T, input string, expected bool, reserved ...string) {
 	t.Helper()
 
-	reservedTree := New(reserved...)
-	actual := reservedTree.IsAllowed(input)
+	tree := New(reserved...)
+	actual := tree.Contains(input)
 
 	if actual != expected {
 		t.Errorf("\nExpected: %t\nActual:   %t\n", expected, actual)
@@ -40,6 +39,6 @@ func BenchmarkTreeTest(b *testing.B) {
 	reservedTree := New("ANOTHER", "RANDOM", "WORD")
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		_ = reservedTree.IsAllowed(stringToCheck)
+		_ = reservedTree.Contains(stringToCheck)
 	}
 }

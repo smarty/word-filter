@@ -1,7 +1,7 @@
 package wordfilter
 
 type Filter interface {
-	IsAllowed(value string) bool
+	Contains(value string) bool
 }
 
 type treeNode struct {
@@ -56,18 +56,18 @@ func (this *treeNode) add(value string) {
 	child.add(remainingWord)
 }
 
-func (this *treeNode) IsAllowed(input string) bool {
+func (this *treeNode) Contains(input string) bool {
 	allowed := true
 	raw := []byte(input)
 	inputLength := len(input)
 
 	for index := 0; index < inputLength; index++ {
 		if allowed, index = this.isAllowed(raw, index); !allowed {
-			return false
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 func (this *treeNode) isAllowed(input []byte, index int) (bool, int) {
 	if len(input) == index || input[index] == ' ' || input[index] == '\n' || input[index] == '\t' {
