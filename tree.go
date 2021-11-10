@@ -20,7 +20,6 @@ func New(reserved ...string) Filter {
 
 	return this
 }
-
 func (this *treeNode) add(value string) {
 	if len(value) == 0 {
 		this.isWord = true
@@ -57,41 +56,41 @@ func (this *treeNode) add(value string) {
 }
 
 func (this *treeNode) Contains(input string) bool {
-	allowed := true
+	contains := true
 	inputLength := len(input)
 
 	for index := 0; index < inputLength; index++ {
-		if allowed, index = this.isAllowed(input, index); !allowed {
+		if contains, index = this.contains(input, index); contains {
 			return true
 		}
 	}
 
 	return false
 }
-func (this *treeNode) isAllowed(input string, index int) (bool, int) {
+func (this *treeNode) contains(input string, index int) (bool, int) {
 	if len(input) == index || input[index] == ' ' || input[index] == '\n' || input[index] == '\t' {
 		if this.isWord == true {
-			return false, index
+			return true, index
 		}
 
-		return true, index
+		return false, index
 	}
 
 	for _, child := range this.children {
 		if input[index] == child.wordFragmentLower {
-			return child.isAllowed(input, index+1)
+			return child.contains(input, index+1)
 
 		} else if input[index] == child.wordFragmentUpper {
-			return child.isAllowed(input, index+1)
+			return child.contains(input, index+1)
 
 		} else {
 			for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index+1 {
 				index += 1
 			}
 
-			return true, index
+			return false, index
 		}
 	}
 
-	return true, index
+	return false, index
 }
