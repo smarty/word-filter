@@ -5,10 +5,10 @@ type Filter interface {
 }
 
 type treeNode struct {
-	wordFragmentUpper byte
-	wordFragmentLower byte
-	isWord            bool
-	children          []*treeNode
+	uppercase byte
+	lowercase byte
+	isWord    bool
+	children  []*treeNode
 }
 
 func New(reserved ...string) Filter {
@@ -26,31 +26,22 @@ func (this *treeNode) add(value string) {
 		return
 	}
 
-	wordFragment := value[0]
-
-	// check if lowercase letter
-	if !('a' <= wordFragment && wordFragment <= 'z') {
-		// check if uppercase letter, change to lower
-		if 'A' <= wordFragment && wordFragment <= 'Z' {
-			wordFragment += 'a' - 'A'
+	character := value[0]
+	if !('a' <= character && character <= 'z') {
+		if 'A' <= character && character <= 'Z' {
+			character += 'a' - 'A'
 		}
 	}
 
 	remainingWord := value[1:]
 	for _, child := range this.children {
-		if child.wordFragmentLower == wordFragment {
+		if child.lowercase == character {
 			child.add(remainingWord)
 			return
 		}
 	}
 
-	child := &treeNode{
-		wordFragmentLower: wordFragment,
-		wordFragmentUpper: wordFragment - ('a' - 'A'),
-		children:          nil,
-		isWord:            false,
-	}
-
+	child := &treeNode{lowercase: character, uppercase: character - ('a' - 'A')}
 	this.children = append(this.children, child)
 	child.add(remainingWord)
 }
@@ -77,10 +68,10 @@ func (this *treeNode) contains(input string, index int) (bool, int) {
 	}
 
 	for _, child := range this.children {
-		if input[index] == child.wordFragmentLower {
+		if input[index] == child.lowercase {
 			return child.contains(input, index+1)
 
-		} else if input[index] == child.wordFragmentUpper {
+		} else if input[index] == child.uppercase {
 			return child.contains(input, index+1)
 
 		} else {
