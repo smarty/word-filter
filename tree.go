@@ -58,18 +58,17 @@ func (this *treeNode) add(value string) {
 
 func (this *treeNode) Contains(input string) bool {
 	allowed := true
-	raw := []byte(input)
 	inputLength := len(input)
 
 	for index := 0; index < inputLength; index++ {
-		if allowed, index = this.isAllowed(raw, index); !allowed {
+		if allowed, index = this.isAllowed(input, index); !allowed {
 			return true
 		}
 	}
 
 	return false
 }
-func (this *treeNode) isAllowed(input []byte, index int) (bool, int) {
+func (this *treeNode) isAllowed(input string, index int) (bool, int) {
 	if len(input) == index || input[index] == ' ' || input[index] == '\n' || input[index] == '\t' {
 		if this.isWord == true {
 			return false, index

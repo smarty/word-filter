@@ -31,13 +31,15 @@ func assertContains(t *testing.T, input string, expected bool, reserved ...strin
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func BenchmarkTreeTest(b *testing.B) {
-	b.ReportAllocs()
 	// 256 chars
 	stringToCheck := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut " +
 		"labore et dolore magna aliqua. Ut EMIM ad minim veniam, quis nostrud exercitation ULLAMCO laboris nisi ut " +
 		"aliquip ex ea commodo consequat. Duis aute irure d RANDOM"
 	reservedTree := New("ANOTHER", "RANDOM", "WORD")
+
+	b.ReportAllocs()
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		_ = reservedTree.Contains(stringToCheck)
 	}
