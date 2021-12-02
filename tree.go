@@ -74,13 +74,11 @@ func (this *treeNode) contains(input string, index int) (bool, int) {
 		} else if input[index] == child.uppercase {
 			return child.contains(input, index+1)
 
-		} else {
-			for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index+1 {
-				index += 1
-			}
-
-			return false, index
 		}
+	}
+
+	for input[index] != ' ' && input[index] != '\n' && input[index] != '\t' && len(input) != index+1 {
+		index += 1
 	}
 
 	return false, index

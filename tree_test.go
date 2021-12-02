@@ -6,8 +6,9 @@ func TestTreeFiltering(t *testing.T) {
 	assertContains(t, "WORD", true, "word")
 	assertContains(t, "word", true, "word")
 	assertContains(t, "woRd", true, "word")
+	assertContains(t, "woRd", true, "restricted", "word")
 
-	assertContains(t, "A sentence with a word in the middle", true, "word", "restricted")
+	assertContains(t, "A sentence with a word in the middle", true, "restricted", "word")
 	assertContains(t, "A sentence with a word\n in the middle", true, "word", "restricted")
 	assertContains(t, "A sentence with a word	 in the middle", true, "word", "restricted")
 
